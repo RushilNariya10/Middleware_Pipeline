@@ -246,3 +246,38 @@ Frontend validation improves user experience by giving instant feedback, but it 
 2. **Server is the gatekeeper** — the API must be the single source of truth for what constitutes valid input, regardless of which client is calling it.
 3. **Defense in depth** — server-side validation catches injection attempts (HTML/script tags), enforces business rules (minimum password length, required fields), and sanitises data before it reaches the database.
 4. **Multiple clients** — mobile apps, CLIs, third-party integrations all hit the same API; only server-side rules are universally enforced.
+
+---
+
+## ⚡ In-Memory Caching & Query Optimization (Practical 9)
+
+### 1. Architectural Changes
+In Practical 9, an in-memory caching tier was implemented using `node-cache` as a singleton module (`utils/cache.js`).
+- **GET /tasks**: Checks cache (`all_tasks`). On HIT, returns data in RAM immediately (`X-Cache: HIT`). On MISS, queries MongoDB Atlas, populates cache (`stdTTL: 60s`), and returns data (`X-Cache: MISS`).
+- **GET /tasks/:id**: Cached separately under deterministic key `task:<id>`.
+- **Write-Through Invalidation**: On `POST /tasks`, the `all_tasks` key is cleared. On `PUT /tasks/:id` and `DELETE /tasks/:id`, both `all_tasks` and `task:<id>` are immediately purged, ensuring zero stale reads.
+- **Security Boundary**: The auth middleware sits strictly in front of the cache check. Unauthenticated requests are rejected with `401 Unauthorized` before reaching the cache.
+
+### 2. Environment Variables
+- `CACHE_ENABLED`: Enables or disables the caching layer (`true` or `false`).
+- `CACHE_TTL_SECONDS`: Configurable Time-to-Live for cached documents in seconds (default `60`).
+
+### 3. Debug Endpoints
+- `GET /api/debug/cache-stats`: Inspects active keys, hit/miss counters, hit ratios, and node-cache internal stats.
+- `POST /api/debug/cache-reset`: Resets counters and optionally clears cache data (`{"clearData": true}`).
+- `POST /api/debug/cache-ttl`: Dynamically updates the TTL in seconds.
+
+### 4. Before vs After Performance Comparison (2,000 Tasks)
+
+| Endpoint | Uncached Warm Avg | Cached Warm Avg | Speed-up Factor |
+|---|---|---|---|
+| **GET /tasks/:id** | 64.58 ms | **2.51 ms** | **25.73x faster** |
+| **GET /tasks** | 1,083.85 ms | **164.20 ms** | **6.60x faster** |
+
+### 5. TTL Experiment (Staleness vs. Performance)
+
+| Configured TTL | Hit Ratio (10s window) | Staleness Duration | Recommendation |
+|---|---|---|---|
+| **5 seconds** | 50.0% | ~5 seconds | Inefficient due to rapid expiration |
+| **60 seconds** | **83.3%** | Up to 60 seconds | **Optimal** for Task Management API |
+| **300 seconds** | 83.3% | Up to 300 seconds | High risk of stale data on direct DB edits |

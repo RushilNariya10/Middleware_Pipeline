@@ -10,6 +10,8 @@ const authRoutes = require('./routes/auth');
 const {
   cache,
   isCacheEnabled,
+  getActiveTTL,
+  setActiveTTL,
   getCacheKey,
   recordHit,
   recordMiss,
@@ -56,7 +58,7 @@ app.get('/tasks', authMiddleware, async (req, res, next) => {
     const tasks = await Task.find();
 
     if (isCacheEnabled()) {
-      cache.set(key, tasks);
+      cache.set(key, tasks, getActiveTTL());
     }
 
     res.status(200).json(tasks);
@@ -91,7 +93,7 @@ app.get('/tasks/:id', authMiddleware, async (req, res, next) => {
     }
 
     if (isCacheEnabled()) {
-      cache.set(key, task);
+      cache.set(key, task, getActiveTTL());
     }
 
     res.status(200).json(task);
@@ -198,6 +200,23 @@ app.post('/api/debug/cache-reset', authMiddleware, (req, res) => {
     message: 'Cache statistics successfully reset.',
     dataCleared: clearData,
     currentStats: getDetailedStats()
+  });
+});
+
+app.post('/api/debug/cache-ttl', authMiddleware, (req, res) => {
+  if (process.env.NODE_ENV === 'production') {
+    return res.status(403).json({
+      message: 'Debug endpoints are disabled in production environment.'
+    });
+  }
+  const ttlSeconds = parseInt(req.body && req.body.ttlSeconds, 10);
+  if (!ttlSeconds || ttlSeconds <= 0) {
+    return res.status(400).json({ message: 'Valid ttlSeconds positive integer is required.' });
+  }
+  setActiveTTL(ttlSeconds);
+  res.status(200).json({
+    message: `Cache TTL successfully configured to ${ttlSeconds} seconds.`,
+    activeTTL: getActiveTTL()
   });
 });
 

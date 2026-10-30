@@ -12,13 +12,22 @@ const NodeCache = require('node-cache');
  * - Deterministic cache key generation
  */
 
-const defaultTTL = parseInt(process.env.CACHE_TTL_SECONDS, 10) || 60;
+let currentTTL = parseInt(process.env.CACHE_TTL_SECONDS, 10) || 60;
 
 const cache = new NodeCache({
-  stdTTL: defaultTTL,
+  stdTTL: currentTTL,
   checkperiod: 120,
   useClones: true // Ensures callers cannot mutate objects stored in cache
 });
+
+function getActiveTTL() {
+  return parseInt(process.env.CACHE_TTL_SECONDS, 10) || currentTTL;
+}
+
+function setActiveTTL(seconds) {
+  currentTTL = parseInt(seconds, 10) || 60;
+  process.env.CACHE_TTL_SECONDS = currentTTL.toString();
+}
 
 // Granular hit/miss counters categorized by query type
 const customStats = {
@@ -167,6 +176,8 @@ function resetStats(clearData = false) {
 module.exports = {
   cache,
   isCacheEnabled,
+  getActiveTTL,
+  setActiveTTL,
   getCacheKey,
   recordHit,
   recordMiss,

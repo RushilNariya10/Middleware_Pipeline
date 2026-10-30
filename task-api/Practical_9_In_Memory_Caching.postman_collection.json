@@ -1,0 +1,445 @@
+{
+  "info": {
+    "_postman_id": "b90e9d1a-4d7a-4ec6-8961- practical9-24it055",
+    "name": "Practical 9: In-Memory Caching & Query Optimization (24IT055)",
+    "description": "Postman test suite for ITUE301 Practical 9 by Rushil Nariya (24IT055). Includes automated auth token storage, cache HIT/MISS assertions, mutation invalidation tests, and cache stats inspection.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "firstTaskId",
+      "value": "6ae427f47ff3f76008a33edf",
+      "type": "string"
+    },
+    {
+      "key": "createdTaskId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Login (Get JWT Token)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"student24it055@charusat.edu.in\",\n  \"password\": \"Password123!\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "login"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "var jsonData = pm.response.json();",
+              "pm.test('JWT token received', function () {",
+              "    pm.expect(jsonData.token).to.be.a('string');",
+              "});",
+              "if (jsonData.token) {",
+              "    pm.collectionVariables.set('token', jsonData.token);",
+              "    console.log('JWT Token successfully set in collection variables.');",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - GET All Tasks (1st Request - MISS or Uncached)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/tasks",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "var xCache = pm.response.headers.get('X-Cache');",
+              "console.log('X-Cache Header Value: ' + xCache);",
+              "pm.test('Response contains task array', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.be.an('array');",
+              "    if (jsonData.length > 0) {",
+              "        pm.collectionVariables.set('firstTaskId', jsonData[0]._id);",
+              "    }",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - GET All Tasks (2nd Request - Expected HIT)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/tasks",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "var xCache = pm.response.headers.get('X-Cache');",
+              "console.log('X-Cache Header: ' + xCache);",
+              "pm.test('X-Cache header is HIT when caching is enabled', function () {",
+              "    if (xCache !== 'BYPASS') {",
+              "        pm.expect(xCache).to.eql('HIT');",
+              "    }",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - GET Single Task by ID (1st Request - MISS)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/tasks/{{firstTaskId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks", "{{firstTaskId}}"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "var xCache = pm.response.headers.get('X-Cache');",
+              "console.log('Single Task X-Cache Header: ' + xCache);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - GET Single Task by ID (2nd Request - Expected HIT)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/tasks/{{firstTaskId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks", "{{firstTaskId}}"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "var xCache = pm.response.headers.get('X-Cache');",
+              "console.log('Single Task 2nd Request X-Cache: ' + xCache);",
+              "pm.test('Single task served from cache (HIT)', function () {",
+              "    if (xCache !== 'BYPASS') {",
+              "        pm.expect(xCache).to.eql('HIT');",
+              "    }",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 - POST Create Task (Triggers Cache Invalidation)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Postman Demonstration Task (Practical 9)\",\n  \"description\": \"Verifying automatic cache invalidation upon write\",\n  \"priority\": \"high\",\n  \"completed\": false\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tasks",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 201 Created', function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "var jsonData = pm.response.json();",
+              "pm.test('Created task contains valid _id', function () {",
+              "    pm.expect(jsonData._id).to.be.a('string');",
+              "    pm.collectionVariables.set('createdTaskId', jsonData._id);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 - GET All Tasks After POST (Verify Invalidation - MISS)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/tasks",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "var xCache = pm.response.headers.get('X-Cache');",
+              "console.log('GET after POST X-Cache: ' + xCache);",
+              "pm.test('X-Cache is MISS due to POST invalidation', function () {",
+              "    if (xCache !== 'BYPASS') {",
+              "        pm.expect(xCache).to.eql('MISS');",
+              "    }",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 - PUT Update Task (Invalidates Single & All)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"UPDATED Postman Task Title\",\n  \"completed\": true,\n  \"priority\": \"medium\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tasks/{{createdTaskId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks", "{{createdTaskId}}"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "var jsonData = pm.response.json();",
+              "pm.test('Task title was updated', function () {",
+              "    pm.expect(jsonData.title).to.eql('UPDATED Postman Task Title');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 - DELETE Task (Invalidates Single & All)",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/tasks/{{createdTaskId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks", "{{createdTaskId}}"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 - GET Cache Stats (Debug Endpoint)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/debug/cache-stats",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "debug", "cache-stats"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "var jsonData = pm.response.json();",
+              "pm.test('Cache debug report structure is valid', function () {",
+              "    pm.expect(jsonData).to.have.property('cacheEnabled');",
+              "    pm.expect(jsonData).to.have.property('breakdown');",
+              "    pm.expect(jsonData).to.have.property('nodeCacheInternal');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 - POST Reset Cache Stats (Debug Endpoint)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"clearData\": true\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/debug/cache-reset",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "debug", "cache-reset"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

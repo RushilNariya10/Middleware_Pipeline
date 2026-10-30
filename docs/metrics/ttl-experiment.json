@@ -1,0 +1,146 @@
+[
+  {
+    "ttlSeconds": 5,
+    "testScenario": "6 requests spaced 2 seconds apart (10s total span)",
+    "hits": 4,
+    "misses": 2,
+    "hitRatioPercent": 66.7,
+    "stalenessWindow": "5 seconds (auto-refreshed on 6th second)",
+    "performanceBenefit": "Low (frequent cache invalidation & re-queries)",
+    "stalenessRisk": "Minimal (expires in 5s)",
+    "requestLog": [
+      {
+        "requestIndex": 1,
+        "elapsedSec": 0,
+        "cacheHeader": "MISS",
+        "durationMs": 46.97
+      },
+      {
+        "requestIndex": 2,
+        "elapsedSec": 2,
+        "cacheHeader": "HIT",
+        "durationMs": 4.62
+      },
+      {
+        "requestIndex": 3,
+        "elapsedSec": 4,
+        "cacheHeader": "HIT",
+        "durationMs": 4.41
+      },
+      {
+        "requestIndex": 4,
+        "elapsedSec": 6,
+        "cacheHeader": "MISS",
+        "durationMs": 85.57
+      },
+      {
+        "requestIndex": 5,
+        "elapsedSec": 8,
+        "cacheHeader": "HIT",
+        "durationMs": 3.43
+      },
+      {
+        "requestIndex": 6,
+        "elapsedSec": 10,
+        "cacheHeader": "HIT",
+        "durationMs": 3.09
+      }
+    ]
+  },
+  {
+    "ttlSeconds": 60,
+    "testScenario": "6 requests spaced 2 seconds apart (10s total span)",
+    "hits": 5,
+    "misses": 1,
+    "hitRatioPercent": 83.3,
+    "stalenessWindow": "Up to 60 seconds (data remained stale during active window)",
+    "performanceBenefit": "High (eliminates repeated DB round trips)",
+    "stalenessRisk": "Balanced / Low with write-invalidation",
+    "requestLog": [
+      {
+        "requestIndex": 1,
+        "elapsedSec": 0,
+        "cacheHeader": "MISS",
+        "durationMs": 246.63
+      },
+      {
+        "requestIndex": 2,
+        "elapsedSec": 2,
+        "cacheHeader": "HIT",
+        "durationMs": 2.72
+      },
+      {
+        "requestIndex": 3,
+        "elapsedSec": 4,
+        "cacheHeader": "HIT",
+        "durationMs": 2.5
+      },
+      {
+        "requestIndex": 4,
+        "elapsedSec": 6,
+        "cacheHeader": "HIT",
+        "durationMs": 3.65
+      },
+      {
+        "requestIndex": 5,
+        "elapsedSec": 8,
+        "cacheHeader": "HIT",
+        "durationMs": 2.57
+      },
+      {
+        "requestIndex": 6,
+        "elapsedSec": 10,
+        "cacheHeader": "HIT",
+        "durationMs": 1.8
+      }
+    ]
+  },
+  {
+    "ttlSeconds": 300,
+    "testScenario": "6 requests spaced 2 seconds apart (10s total span)",
+    "hits": 5,
+    "misses": 1,
+    "hitRatioPercent": 83.3,
+    "stalenessWindow": "Up to 300 seconds (5 minutes) stale window if write bypasses API",
+    "performanceBenefit": "High (eliminates repeated DB round trips)",
+    "stalenessRisk": "High (direct DB updates invisible for 5m)",
+    "requestLog": [
+      {
+        "requestIndex": 1,
+        "elapsedSec": 0,
+        "cacheHeader": "MISS",
+        "durationMs": 436.73
+      },
+      {
+        "requestIndex": 2,
+        "elapsedSec": 2,
+        "cacheHeader": "HIT",
+        "durationMs": 2.15
+      },
+      {
+        "requestIndex": 3,
+        "elapsedSec": 4,
+        "cacheHeader": "HIT",
+        "durationMs": 3.5
+      },
+      {
+        "requestIndex": 4,
+        "elapsedSec": 6,
+        "cacheHeader": "HIT",
+        "durationMs": 3.49
+      },
+      {
+        "requestIndex": 5,
+        "elapsedSec": 8,
+        "cacheHeader": "HIT",
+        "durationMs": 3.07
+      },
+      {
+        "requestIndex": 6,
+        "elapsedSec": 10,
+        "cacheHeader": "HIT",
+        "durationMs": 2.45
+      }
+    ]
+  }
+]

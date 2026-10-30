@@ -67,8 +67,9 @@ async function runBenchmark(mode = 'uncached') {
     'Authorization': `Bearer ${token}`
   };
 
-  // 2. Fetch all tasks once to inspect dataset and obtain a sample ID
+  // 2. Fetch sample ID without priming cache if we want clean measurement, or reset before run
   console.log('Fetching sample task for single-task test...');
+  let sampleTaskId;
   const initialFetch = await httpRequest({
     hostname: 'localhost',
     port: 3000,
@@ -83,8 +84,20 @@ async function runBenchmark(mode = 'uncached') {
   }
 
   const taskCount = initialFetch.body.length;
-  const sampleTaskId = initialFetch.body[0]._id;
-  console.log(`Total tasks retrieved: ${taskCount}. Using sample task ID: ${sampleTaskId}`);
+  sampleTaskId = initialFetch.body[0]._id;
+  console.log(`Total tasks in database: ${taskCount}. Using sample task ID: ${sampleTaskId}`);
+
+  // Reset cache if testing cached mode so Run 1 is a clean MISS
+  if (mode === 'cached') {
+    console.log('Resetting cache to record true cold MISS for Run 1...');
+    await httpRequest({
+      hostname: 'localhost',
+      port: 3000,
+      path: '/api/debug/cache-reset',
+      method: 'POST',
+      headers: { ...authHeaders, 'Content-Type': 'application/json' }
+    }, { clearData: true });
+  }
 
   // 3. Measure GET /tasks (all tasks) - 10 iterations
   console.log('\nBenchmarking GET /tasks (All Tasks) - 10 iterations...');
