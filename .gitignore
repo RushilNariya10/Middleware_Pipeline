@@ -1,0 +1,10 @@
+# Lab reports, PDF task sheets, and Word temp files
+*.docx
+*.pdf
+~$*.docx
+
+# Text extractions & scratch
+docx-text.txt
+
+# Environment variables
+.env
