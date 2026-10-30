@@ -13,7 +13,9 @@ const {
   getCacheKey,
   recordHit,
   recordMiss,
-  invalidateTasksCache
+  invalidateTasksCache,
+  getDetailedStats,
+  resetStats
 } = require('./utils/cache');
 
 const app = express();
@@ -170,6 +172,33 @@ app.delete('/tasks/:id', authMiddleware, async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+});
+
+// ── Debug Endpoints (Supplementary Problem b) ──
+// Protected by authMiddleware, disabled in production
+app.get('/api/debug/cache-stats', authMiddleware, (req, res) => {
+  if (process.env.NODE_ENV === 'production') {
+    return res.status(403).json({
+      message: 'Debug endpoints are disabled in production environment.'
+    });
+  }
+  const stats = getDetailedStats();
+  res.status(200).json(stats);
+});
+
+app.post('/api/debug/cache-reset', authMiddleware, (req, res) => {
+  if (process.env.NODE_ENV === 'production') {
+    return res.status(403).json({
+      message: 'Debug endpoints are disabled in production environment.'
+    });
+  }
+  const clearData = req.body && req.body.clearData === true;
+  resetStats(clearData);
+  res.status(200).json({
+    message: 'Cache statistics successfully reset.',
+    dataCleared: clearData,
+    currentStats: getDetailedStats()
+  });
 });
 
 // Global Error Handler
