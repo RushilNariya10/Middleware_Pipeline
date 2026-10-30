@@ -108,3 +108,4 @@ This empirical performance evaluation analyzes the impact of implementing an in-
    - In a multi-instance deployment (e.g., behind a round-robin load balancer), each Node.js process maintains its own independent `node-cache` instance in heap memory.
    - A write request routed to Server A invalidates only Server A's local cache. Server B will continue serving stale cached data until its TTL expires.
    - **Production Remedy:** Transition to an external, distributed in-memory data store such as **Redis** or **Memcached**.
+
