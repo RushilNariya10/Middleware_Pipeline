@@ -12,7 +12,8 @@ const {
   isCacheEnabled,
   getCacheKey,
   recordHit,
-  recordMiss
+  recordMiss,
+  invalidateTasksCache
 } = require('./utils/cache');
 
 const app = express();
@@ -87,6 +88,12 @@ app.post('/tasks', authMiddleware, validateTask, async (req, res, next) => {
       completed,
       priority
     });
+
+    // Invalidate cache only AFTER successful database write
+    if (isCacheEnabled()) {
+      invalidateTasksCache();
+    }
+
     res.status(201).json(task);
   } catch (err) {
     next(err);
@@ -109,6 +116,12 @@ app.put('/tasks/:id', authMiddleware, validateTask, async (req, res, next) => {
         message: 'Task not found'
       });
     }
+
+    // Invalidate all-tasks and single-task cache only AFTER successful write
+    if (isCacheEnabled()) {
+      invalidateTasksCache(req.params.id);
+    }
+
     res.status(200).json(task);
   } catch (err) {
     next(err);
@@ -124,6 +137,12 @@ app.delete('/tasks/:id', authMiddleware, async (req, res, next) => {
         message: 'Task not found'
       });
     }
+
+    // Invalidate all-tasks and single-task cache only AFTER successful write
+    if (isCacheEnabled()) {
+      invalidateTasksCache(req.params.id);
+    }
+
     res.status(200).json({
       message: 'Task deleted successfully',
       task
