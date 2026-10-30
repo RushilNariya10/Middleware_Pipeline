@@ -63,15 +63,35 @@ app.get('/tasks', authMiddleware, async (req, res, next) => {
   }
 });
 
-// GET - Get single task by ID (Supplementary Problem)
+// GET - Get single task by ID (Supplementary Problem - Cached separately)
 app.get('/tasks/:id', authMiddleware, async (req, res, next) => {
   try {
+    const key = getCacheKey('single', req.params.id);
+
+    if (isCacheEnabled()) {
+      const cached = cache.get(key);
+      if (cached) {
+        recordHit('single');
+        res.setHeader('X-Cache', 'HIT');
+        return res.status(200).json(cached);
+      }
+      recordMiss('single');
+      res.setHeader('X-Cache', 'MISS');
+    } else {
+      res.setHeader('X-Cache', 'BYPASS');
+    }
+
     const task = await Task.findById(req.params.id);
     if (!task) {
       return res.status(404).json({
         message: 'Task not found'
       });
     }
+
+    if (isCacheEnabled()) {
+      cache.set(key, task);
+    }
+
     res.status(200).json(task);
   } catch (err) {
     next(err);
