@@ -1,0 +1,191 @@
+{
+  "mode": "uncached",
+  "timestamp": "2026-10-30T12:41:11.943Z",
+  "environment": {
+    "nodeVersion": "v24.13.0",
+    "datasetSize": 2000,
+    "sampleTaskId": "6ae427f47ff3f76008a33edf",
+    "database": "MongoDB Atlas (M0 Free Tier)",
+    "authScope": "Global Task Collection with JWT Auth Pipeline"
+  },
+  "endpoints": {
+    "allTasks": {
+      "route": "GET /tasks",
+      "stats": {
+        "totalRuns": 10,
+        "coldDurationMs": 1976.21,
+        "warmOnly": {
+          "min": 245.79,
+          "avg": 1083.85,
+          "max": 2323.33
+        },
+        "overall": {
+          "min": 245.79,
+          "avg": 1173.09,
+          "max": 2323.33
+        },
+        "readings": [
+          {
+            "iteration": 1,
+            "durationMs": 1976.21,
+            "statusCode": 200,
+            "xCache": "NONE",
+            "itemCount": 2000
+          },
+          {
+            "iteration": 2,
+            "durationMs": 1959.8,
+            "statusCode": 200,
+            "xCache": "NONE",
+            "itemCount": 2000
+          },
+          {
+            "iteration": 3,
+            "durationMs": 1840.76,
+            "statusCode": 200,
+            "xCache": "NONE",
+            "itemCount": 2000
+          },
+          {
+            "iteration": 4,
+            "durationMs": 2185.39,
+            "statusCode": 200,
+            "xCache": "NONE",
+            "itemCount": 2000
+          },
+          {
+            "iteration": 5,
+            "durationMs": 2323.33,
+            "statusCode": 200,
+            "xCache": "NONE",
+            "itemCount": 2000
+          },
+          {
+            "iteration": 6,
+            "durationMs": 304.45,
+            "statusCode": 200,
+            "xCache": "NONE",
+            "itemCount": 2000
+          },
+          {
+            "iteration": 7,
+            "durationMs": 311.48,
+            "statusCode": 200,
+            "xCache": "NONE",
+            "itemCount": 2000
+          },
+          {
+            "iteration": 8,
+            "durationMs": 262.86,
+            "statusCode": 200,
+            "xCache": "NONE",
+            "itemCount": 2000
+          },
+          {
+            "iteration": 9,
+            "durationMs": 245.79,
+            "statusCode": 200,
+            "xCache": "NONE",
+            "itemCount": 2000
+          },
+          {
+            "iteration": 10,
+            "durationMs": 320.81,
+            "statusCode": 200,
+            "xCache": "NONE",
+            "itemCount": 2000
+          }
+        ]
+      }
+    },
+    "singleTask": {
+      "route": "GET /tasks/:id",
+      "stats": {
+        "totalRuns": 10,
+        "coldDurationMs": 54.68,
+        "warmOnly": {
+          "min": 49.97,
+          "avg": 64.58,
+          "max": 98.86
+        },
+        "overall": {
+          "min": 49.97,
+          "avg": 63.59,
+          "max": 98.86
+        },
+        "readings": [
+          {
+            "iteration": 1,
+            "durationMs": 54.68,
+            "statusCode": 200,
+            "xCache": "NONE",
+            "taskId": "6ae427f47ff3f76008a33edf"
+          },
+          {
+            "iteration": 2,
+            "durationMs": 49.97,
+            "statusCode": 200,
+            "xCache": "NONE",
+            "taskId": "6ae427f47ff3f76008a33edf"
+          },
+          {
+            "iteration": 3,
+            "durationMs": 53.09,
+            "statusCode": 200,
+            "xCache": "NONE",
+            "taskId": "6ae427f47ff3f76008a33edf"
+          },
+          {
+            "iteration": 4,
+            "durationMs": 68.38,
+            "statusCode": 200,
+            "xCache": "NONE",
+            "taskId": "6ae427f47ff3f76008a33edf"
+          },
+          {
+            "iteration": 5,
+            "durationMs": 59.39,
+            "statusCode": 200,
+            "xCache": "NONE",
+            "taskId": "6ae427f47ff3f76008a33edf"
+          },
+          {
+            "iteration": 6,
+            "durationMs": 58.88,
+            "statusCode": 200,
+            "xCache": "NONE",
+            "taskId": "6ae427f47ff3f76008a33edf"
+          },
+          {
+            "iteration": 7,
+            "durationMs": 56.48,
+            "statusCode": 200,
+            "xCache": "NONE",
+            "taskId": "6ae427f47ff3f76008a33edf"
+          },
+          {
+            "iteration": 8,
+            "durationMs": 51.17,
+            "statusCode": 200,
+            "xCache": "NONE",
+            "taskId": "6ae427f47ff3f76008a33edf"
+          },
+          {
+            "iteration": 9,
+            "durationMs": 84.99,
+            "statusCode": 200,
+            "xCache": "NONE",
+            "taskId": "6ae427f47ff3f76008a33edf"
+          },
+          {
+            "iteration": 10,
+            "durationMs": 98.86,
+            "statusCode": 200,
+            "xCache": "NONE",
+            "taskId": "6ae427f47ff3f76008a33edf"
+          }
+        ]
+      }
+    }
+  }
+}
