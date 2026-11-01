@@ -1,0 +1,136 @@
+{
+  "timestamp": "2026-10-30T06:26:31.049Z",
+  "url": "http://localhost:4173/",
+  "build": {
+    "html": {
+      "file": "dist/index.html",
+      "raw": "0.48 kB",
+      "gzip": "0.31 kB"
+    },
+    "css": [
+      {
+        "file": "dist/assets/index-BqZpNbOR.css",
+        "raw": "11.77 kB",
+        "gzip": "2.91 kB"
+      }
+    ],
+    "js": [
+      {
+        "file": "dist/assets/index-CUP8iI_s.js",
+        "raw": "253.73 kB",
+        "gzip": "79.93 kB"
+      }
+    ],
+    "totalJsFiles": 1
+  },
+  "measurements": {
+    "unthrottled": {
+      "condition": "unthrottled",
+      "throttled": false,
+      "runs": [
+        {
+          "run": 1,
+          "jsRequests": 1,
+          "totalJsTransferredBytes": 253736,
+          "totalJsTransferredKB": "247.79",
+          "domContentLoadedMs": 186,
+          "loadEventMs": 187,
+          "jsFiles": [
+            {
+              "url": "index-CUP8iI_s.js",
+              "sizeBytes": 253736
+            }
+          ]
+        },
+        {
+          "run": 2,
+          "jsRequests": 1,
+          "totalJsTransferredBytes": 253736,
+          "totalJsTransferredKB": "247.79",
+          "domContentLoadedMs": 82,
+          "loadEventMs": 82,
+          "jsFiles": [
+            {
+              "url": "index-CUP8iI_s.js",
+              "sizeBytes": 253736
+            }
+          ]
+        },
+        {
+          "run": 3,
+          "jsRequests": 1,
+          "totalJsTransferredBytes": 253736,
+          "totalJsTransferredKB": "247.79",
+          "domContentLoadedMs": 104,
+          "loadEventMs": 104,
+          "jsFiles": [
+            {
+              "url": "index-CUP8iI_s.js",
+              "sizeBytes": 253736
+            }
+          ]
+        }
+      ],
+      "averages": {
+        "jsRequests": 1,
+        "totalJsTransferredKB": 247.79,
+        "domContentLoadedMs": 124,
+        "loadEventMs": 124
+      }
+    },
+    "slow3G": {
+      "condition": "slow3g",
+      "throttled": true,
+      "runs": [
+        {
+          "run": 1,
+          "jsRequests": 1,
+          "totalJsTransferredBytes": 253736,
+          "totalJsTransferredKB": "247.79",
+          "domContentLoadedMs": 2532,
+          "loadEventMs": 2532,
+          "jsFiles": [
+            {
+              "url": "index-CUP8iI_s.js",
+              "sizeBytes": 253736
+            }
+          ]
+        },
+        {
+          "run": 2,
+          "jsRequests": 1,
+          "totalJsTransferredBytes": 253736,
+          "totalJsTransferredKB": "247.79",
+          "domContentLoadedMs": 2519,
+          "loadEventMs": 2519,
+          "jsFiles": [
+            {
+              "url": "index-CUP8iI_s.js",
+              "sizeBytes": 253736
+            }
+          ]
+        },
+        {
+          "run": 3,
+          "jsRequests": 1,
+          "totalJsTransferredBytes": 253736,
+          "totalJsTransferredKB": "247.79",
+          "domContentLoadedMs": 2513,
+          "loadEventMs": 2514,
+          "jsFiles": [
+            {
+              "url": "index-CUP8iI_s.js",
+              "sizeBytes": 253736
+            }
+          ]
+        }
+      ],
+      "averages": {
+        "jsRequests": 1,
+        "totalJsTransferredKB": 247.79,
+        "domContentLoadedMs": 2521,
+        "loadEventMs": 2522
+      }
+    }
+  }
+}

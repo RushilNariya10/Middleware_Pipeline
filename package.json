@@ -1,0 +1,18 @@
+{
+  "name": "awdf-fullstack-project",
+  "version": "1.0.0",
+  "description": "Unified AWDF Full-Stack Project (ITUE301) - Rushil Nariya (24IT055)",
+  "scripts": {
+    "dev:backend": "npm run dev --prefix task-api",
+    "dev:frontend": "npm run dev --prefix portfolio-24IT055",
+    "build:frontend": "npm run build --prefix portfolio-24IT055",
+    "test:backend": "npm test --prefix task-api",
+    "test:auth": "npm run test:auth --prefix task-api",
+    "test:practical5": "node Task_Manager_API/test.js",
+    "lint:backend": "npm run lint --prefix task-api",
+    "lint:frontend": "npm run lint --prefix portfolio-24IT055"
+  },
+  "author": "Rushil Nariya (24IT055)",
+  "license": "ISC"
+}
+

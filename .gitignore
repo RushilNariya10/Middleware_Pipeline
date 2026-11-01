@@ -14,6 +14,12 @@ docx-text.txt
 # Dependencies
 node_modules/
 **/node_modules/
+dist/
+**/dist/
+
+# Scratch & Temporary
+_temp_repos/
+.gemini/
 
 # Logs & temp
 npm-debug.log*

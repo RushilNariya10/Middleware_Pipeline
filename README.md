@@ -1,4 +1,5 @@
-# Practical 9: In-Memory Caching and Query Optimization
+# Advanced Web Development Frameworks (AWDF - ITUE301)
+## Full-Stack Project: Portfolio & Task Manager API
 
 **Charotar University of Science and Technology (CHARUSAT)**  
 **Faculty of Technology and Engineering (FTE)**  
@@ -7,151 +8,163 @@
 
 - **Student Name:** Rushil Nariya  
 - **Student ID:** 24IT055  
-- **GitHub Repository:** [https://github.com/RushilNariya10/Middleware_Pipeline](https://github.com/RushilNariya10/Middleware_Pipeline)  
-- **Tech Stack:** Node.js (v18+), Express.js, MongoDB Atlas, Mongoose ODM, node-cache, JSON Web Tokens (JWT), React (Vite)
+- **Merged Source Repositories:**
+  - Frontend: [portfolio-24IT055](https://github.com/RushilNariya10/portfolio-24IT055)
+  - Backend & Pipeline: [Middleware_Pipeline](https://github.com/RushilNariya10/Middleware_Pipeline)
+  - Core API (Practicals 4 & 5): [Task_Manager_API](https://github.com/RushilNariya10/Task_Manager_API)
+  - Integration: [FullStack_Integration](https://github.com/RushilNariya10/FullStack_Integration)
 
 ---
 
-## 📌 Repository Overview
+## 📌 Project Overview
 
-This repository represents the full-stack Task Management platform developed across the AWDF laboratory curriculum:
-1. **Practicals 4–5:** Express REST API architecture & Mongoose schema design
-2. **Practical 6:** Full-stack integration with React frontend
-3. **Practical 7:** JWT authentication pipeline, password hashing, and server-side validation
-4. **Practical 8:** Client-side performance optimization with lazy loading & code splitting
-5. **Practical 9 (Current):** In-Memory Caching (`node-cache`), write-through invalidation, and query latency optimization
+This repository represents the **unified, complete source code** of the AWDF laboratory project, progressively built across all 13 semester practicals. It brings together the React frontend client, Node.js/Express REST API backend, MongoDB persistence, JWT authentication, in-memory caching, event-driven background processing, containerization, automated testing & CI/CD pipelines, and AI-assisted task enhancements.
 
 ---
 
-## 🏗️ In-Memory Caching Architecture & Pipeline
+## 📑 Complete Curriculum Practical Mapping
 
-In Practical 9, an in-memory caching tier was implemented using `node-cache` as a singleton module. The caching logic strictly enforces the security boundary:
+| Practical | Module / Topic | Implementation Location | Key Highlights |
+| :--- | :--- | :--- | :--- |
+| **Practical 1** | Portfolio Website Setup | `portfolio-24IT055/` | React 19, Vite, responsive vanilla CSS, modular components (Header, About, Skills, Projects, Footer) |
+| **Practical 2** | Client-Side Routing & State | `portfolio-24IT055/src/pages/` | React Router DOM v7 (`/`, `/projects`, `/contact`), `useState` hooks |
+| **Practical 3** | External API Integration | `portfolio-24IT055/src/components/RepoList.jsx` | GitHub REST API integration, dynamic repository cards, loading spinner, error boundary, search filtering |
+| **Practical 4** | RESTful API Development | `Task_Manager_API/` & `task-api/` | Express.js REST API with full CRUD endpoints (`GET`, `POST`, `PUT`, `DELETE` `/tasks`), status codes, error handlers |
+| **Practical 5** | Database & Mongoose Schema | `Task_Manager_API/models/Task.js` | MongoDB Atlas integration, Mongoose Schema with strict validation, pre-save trimming hooks, enum validation |
+| **Practical 6** | Full Stack Integration | `portfolio-24IT055/src/pages/Tasks.jsx` | Frontend proxy configuration, connecting React client to backend `/tasks` endpoint |
+| **Practical 7** | Authentication & Middleware | `task-api/middleware/`, `routes/auth.js` | JWT authentication, bcryptjs hashing, User model, auth middleware pipeline, AuthContext & Protected Routes in UI |
+| **Practical 8** | Performance Optimization | `portfolio-24IT055/src/utils/` | Code splitting with `React.lazy` and `Suspense`, delayed route fallbacks, Recharts lazy loading, `React.memo` optimization |
+| **Practical 9** | In-Memory Caching & Optimization | `task-api/utils/cache.js` | `node-cache` integration, automatic invalidation on writes, hit/miss telemetry, `/api/debug/cache-stats` |
+| **Practical 10** | Event-Driven Architecture | `task-api/events.js`, `listeners.js` | Node.js `EventEmitter`, decoupled non-blocking background listeners for asynchronous tasks |
+| **Practical 11** | Containerization & Deployment | `Dockerfile`, `docker-compose.yml` | Multi-stage Dockerfile for React with Nginx, backend Dockerfile, multi-container orchestration with healthchecks |
+| **Practical 12** | CI/CD Pipeline & Automated Tests | `.github/workflows/ci.yml`, `__tests__/` | GitHub Actions workflow, Jest test suites, ESLint static analysis, automated CI quality gates |
+| **Practical 13** | AI Service Integration | `task-api/services/aiService.js`, `Tasks.jsx` | OpenAI/Gemini AI task description generator, rate limiting, UI suggestion generator with discard/keep controls |
+
+---
+
+## 📂 Repository Structure
+
 ```text
-  Client (Postman / React)
-             │
-             ▼
-  ┌────────────────────────────────────────────────────────┐
-  │ 1. CORS & JSON Parsing Middleware                      │
-  └──────────────────────────┬─────────────────────────────┘
-                             │
-                             ▼
-  ┌────────────────────────────────────────────────────────┐
-  │ 2. Authentication Middleware (JWT Verification)        │
-  │    (Rejects unauthenticated requests with 401 early)    │
-  └──────────────────────────┬─────────────────────────────┘
-                             │
-                             ▼
-  ┌────────────────────────────────────────────────────────┐
-  │ 3. Server-Side Validation Middleware                   │
-  │    (Sanitizes payload, checks required fields)         │
-  └──────────────────────────┬─────────────────────────────┘
-                             │
-                             ▼
-  ┌────────────────────────────────────────────────────────┐
-  │ 4. Cache Check (node-cache singleton in RAM)           │
-  │                                                        │
-  │   ├── HIT  ──▶ Set X-Cache: HIT ──▶ Return Cached Data │
-  │   │            (Latency: ~2.5 ms for single task)      │
-  │   │                                                    │
-  │   └── MISS ──▶ Set X-Cache: MISS ──▶ Query MongoDB     │
-  │                ──▶ Store in Cache (TTL: 60s)           │
-  │                ──▶ Return Fresh Response               │
-  └──────────────────────────┬─────────────────────────────┘
-                             │
-    On Mutations (POST / PUT / DELETE)
-                             │
-                             ▼
-  ┌────────────────────────────────────────────────────────┐
-  │ 5. Database Write Execution & Cache Invalidation       │
-  │    - POST: Purges 'all_tasks' key                      │
-  │    - PUT/DELETE: Purges 'all_tasks' AND 'task:<id>'    │
-  │    - Guaranteed $0%$ Stale Data Served                  │
-  └────────────────────────────────────────────────────────┘
+AWDF-Project/
+├── .github/
+│   └── workflows/
+│       └── ci.yml                     # Practical 12: GitHub Actions CI workflow
+├── docs/
+│   ├── code_snaps/                    # Practical screenshot captures & code evidence
+│   └── metrics/                       # Performance baselines, TTL experiments & comparison reports
+├── portfolio-24IT055/                 # Full Frontend Client (React 19 + Vite + React Router)
+│   ├── public/                        # Static assets & SVG icons
+│   ├── src/
+│   │   ├── assets/                    # Hero banners, SVG icons
+│   │   ├── components/                # Reusable UI components & lazy chart
+│   │   ├── context/                   # AuthContext for session management
+│   │   ├── pages/                     # Home, Projects, Contact, Tasks, Analytics, Login, Register
+│   │   └── utils/                     # lazyWithDelay utility for Suspense
+│   ├── Dockerfile                     # Multi-stage production build with Nginx
+│   ├── nginx.conf                     # Nginx client-side routing & caching configuration
+│   └── vite.config.js                 # Vite dev server with backend API proxy
+├── task-api/                          # Comprehensive Backend API (Practicals 4–13)
+│   ├── assets/                        # Postman screenshots and institution logos
+│   ├── middleware/                    # auth.js (JWT) & validate.js (input validation)
+│   ├── models/                        # Task.js & User.js (Mongoose schemas)
+│   ├── routes/                        # auth.js & ai.js (Express routers)
+│   ├── services/                      # aiService.js (LLM suggestion provider)
+│   ├── utils/                         # cache.js (node-cache singleton & telemetry)
+│   ├── __tests__/                     # Jest automated test suites (tasks, events, ai)
+│   ├── Dockerfile                     # Production Node.js container definition
+│   ├── events.js & listeners.js       # Practical 10 EventEmitter setup
+│   ├── server.js                      # Main Express server application
+│   ├── test.js                        # Practical 5 automated test runner
+│   └── test-auth.js                   # Practical 7 automated auth test runner
+├── Task_Manager_API/                  # Standalone Reference for Practicals 4 & 5
+│   ├── assets/                        # Postman execution proofs
+│   ├── models/Task.js                 # Task schema
+│   ├── server.js                      # REST API server (Practicals 4 & 5)
+│   └── test.js                        # MongoMemoryServer test suite
+├── scripts/                           # Telemetry, seed & benchmarking scripts
+│   ├── benchmark.js
+│   ├── event-demo.js
+│   ├── seed.js
+│   ├── ttl-experiment.js
+│   └── verify-correctness.js
+├── docker-compose.yml                 # Full stack multi-container orchestration
+├── postman_collection.json            # Unified Postman collection for API endpoints
+├── run.bat                            # One-click startup script (Windows)
+├── .gitignore                         # Project-wide ignore definitions
+└── package.json                       # Root workspace scripts helper
 ```
 
 ---
 
-## ⚙️ Environment Variables
+## 🚀 Getting Started
 
-The backend supports zero-downtime cache toggling and configurable retention via `.env`:
-
-| Variable Name | Required | Default | Purpose |
-|---|---|---|---|
-| `MONGO_URI` | Yes | — | MongoDB Atlas connection string |
-| `PORT` | No | `3000` | Port for the Express server |
-| `JWT_SECRET` | Yes | — | Cryptographic secret for signing tokens |
-| `CACHE_ENABLED` | No | `true` | On/Off toggle (`true` / `false`) for caching |
-| `CACHE_TTL_SECONDS` | No | `60` | Time-to-Live retention in seconds (default 60s) |
+### Prerequisites
+- **Node.js**: v18+ (tested on Node v20/v24)
+- **MongoDB**: Local MongoDB instance or MongoDB Atlas connection string
+- **Docker & Docker Compose** (optional, for containerized run)
 
 ---
 
-## 📊 Before vs. After Empirical Performance Comparison
+### Quick Start (One-Click Runner)
 
-Benchmarked on **2,000 task documents** against a remote **MongoDB Atlas** cluster:
-
-### Table 1: GET /tasks/:id (Single Task Query)
-| Metric | Uncached Baseline | In-Memory Cached | Improvement / Factor |
-|---|---|---|---|
-| **Cold Request (Miss)** | 54.68 ms | 161.60 ms | Cache population cost |
-| **Warm Average (Runs 2–10)** | **64.58 ms** | **2.51 ms** | **25.73x Faster (96.1% Latency Drop)** |
-| **Peak Latency (Fastest Hit)** | 49.97 ms | 1.84 ms | **27.15x Faster** |
-| **Header Inspection** | `X-Cache: NONE` | `X-Cache: HIT` | Postman visibility |
-
-### Table 2: GET /tasks (All 2,000 Tasks)
-| Metric | Uncached Baseline | In-Memory Cached | Improvement / Factor |
-|---|---|---|---|
-| **Cold Request (Miss)** | 1,976.21 ms | 2,859.02 ms | Initial query + cache set |
-| **Warm Average (Runs 2–10)** | **1,083.85 ms** | **164.20 ms** | **6.60x Faster (84.8% Latency Drop)** |
-| **Fastest Run** | 245.79 ms | 148.15 ms | Zero database queries |
+On Windows, double-click or run:
+```cmd
+run.bat
+```
+This script will:
+1. Start the **Task Manager API** backend on `http://localhost:3000`
+2. Start the **React Portfolio & Tasks** frontend on `http://localhost:5173`
+3. Launch your default browser directly to `http://localhost:5173/tasks`
 
 ---
 
-## ⏱️ Supplementary Problem: TTL Experiment & Staleness Analysis
+### Running via Docker Compose
 
-Conducted across three TTL configurations using 6 requests spaced 2 seconds apart:
-
-| Configured TTL | Hit / Miss Count (10s window) | Hit Ratio (%) | Staleness Duration | Performance vs. Staleness Trade-off |
-|---|---|---|---|---|
-| **5 seconds** | 3 Hits / 3 Misses | **50.0%** | ~5 seconds | Frequent cache evictions; low database offloading |
-| **60 seconds** | 5 Hits / 1 Miss | **83.3%** | Up to 60 seconds | **Optimal:** High hit ratio, protected by active write invalidation |
-| **300 seconds (5m)** | 5 Hits / 1 Miss | **83.3%** | Up to 300 seconds | Maximum DB offloading; risk of staleness if modified directly in DB |
-
----
-
-## 🛠️ Debug Endpoints (Protected by Auth)
-
-Exposed under `/api/debug` for real-time monitoring:
-- `GET /api/debug/cache-stats`: Returns active keys, hit/miss counters, hit ratios, and internal node-cache telemetry.
-- `POST /api/debug/cache-reset`: Accepts `{"clearData": true}` to reset statistics counters and flush the cache.
-- `POST /api/debug/cache-ttl`: Accepts `{"ttlSeconds": 60}` to dynamically configure TTL without server restarts.
-
----
-
-## 🚀 How to Reproduce Measurements
-
-### 1. Seed Database (2,000 Tasks)
+To launch the complete isolated production stack with one command:
 ```bash
-node scripts/seed.js --count=2000
+docker compose up --build
 ```
+This provisions:
+- **`awdf-mongodb`**: MongoDB 7 database container with healthcheck on port `27017`
+- **`awdf-backend`**: Node.js Express API container on port `3000`
+- **`awdf-frontend`**: Nginx static build container on port `5173`
 
-### 2. Start Backend Server
+---
+
+### Manual Setup & Execution
+
+#### 1. Backend (`task-api`)
 ```bash
 cd task-api
-node server.js
+npm install
+cp .env.example .env     # Configure MONGO_URI, PORT, JWT_SECRET
+npm run dev
 ```
 
-### 3. Run Automated Benchmarks
+#### 2. Frontend (`portfolio-24IT055`)
 ```bash
-# Measure Uncached Baseline
-node scripts/benchmark.js uncached
-
-# Measure Cached Performance
-node scripts/benchmark.js cached
-
-# Verify Cache Correctness & Mutation Invalidation
-node scripts/verify-correctness.js
-
-# Run TTL Staleness Experiment
-node scripts/ttl-experiment.js
+cd portfolio-24IT055
+npm install
+npm run dev
 ```
+Visit `http://localhost:5173` in your browser.
+
+---
+
+## 🧪 Testing Suites
+
+Each practical includes dedicated automated tests to verify functionality:
+
+| Test Command | Scope |
+| :--- | :--- |
+| `npm run test:practical5` | Runs Practical 5 MongoDB Mongoose in-memory schema tests (10/10 tests) |
+| `npm run test:auth` | Runs Practical 7 JWT authentication & pipeline tests (18/18 tests) |
+| `cd task-api && npm test` | Runs Jest CI test suites across all endpoints, events, and AI handlers |
+| `node scripts/event-demo.js` | Runs Practical 10 background EventEmitter demonstration |
+| `node scripts/benchmark.js` | Runs Practical 9 cached vs uncached performance benchmarks |
+
+---
+
+## 🛡️ License & Academic Declaration
+Developed by **Rushil Nariya (24IT055)** for the **Advanced Web Development Frameworks (ITUE301)** coursework at **CHARUSAT**.
 

@@ -1,0 +1,218 @@
+{
+  "timestamp": "2026-10-30T06:33:35.369Z",
+  "url": "http://localhost:4173/",
+  "build": {
+    "html": {
+      "file": "dist/index.html",
+      "raw": "0.48 kB",
+      "gzip": "0.31 kB"
+    },
+    "css": [
+      {
+        "file": "dist/assets/index-BqZpNbOR.css",
+        "raw": "11.77 kB",
+        "gzip": "2.91 kB"
+      }
+    ],
+    "mainJs": {
+      "file": "dist/assets/index-Dwc4Ukyf.js",
+      "raw": "239.71 kB",
+      "gzip": "76.93 kB"
+    },
+    "lazyChunks": [
+      {
+        "name": "NotFound",
+        "file": "dist/assets/NotFound-D9bXoX2J.js",
+        "raw": "0.31 kB",
+        "gzip": "0.24 kB"
+      },
+      {
+        "name": "ErrorMessage",
+        "file": "dist/assets/ErrorMessage-DhJdkxZ8.js",
+        "raw": "0.57 kB",
+        "gzip": "0.33 kB"
+      },
+      {
+        "name": "Contact",
+        "file": "dist/assets/Contact-B30u6xdd.js",
+        "raw": "1.35 kB",
+        "gzip": "0.69 kB"
+      },
+      {
+        "name": "Login",
+        "file": "dist/assets/Login-NrSzLECZ.js",
+        "raw": "1.55 kB",
+        "gzip": "0.72 kB"
+      },
+      {
+        "name": "Home",
+        "file": "dist/assets/Home-lz7-31af.js",
+        "raw": "1.64 kB",
+        "gzip": "0.68 kB"
+      },
+      {
+        "name": "Register",
+        "file": "dist/assets/Register-B_l9vWF4.js",
+        "raw": "2.20 kB",
+        "gzip": "0.90 kB"
+      },
+      {
+        "name": "Analytics",
+        "file": "dist/assets/Analytics-BYpNAmB7.js",
+        "raw": "2.99 kB",
+        "gzip": "1.27 kB"
+      },
+      {
+        "name": "Projects",
+        "file": "dist/assets/Projects-D8DBQer9.js",
+        "raw": "4.91 kB",
+        "gzip": "1.85 kB"
+      },
+      {
+        "name": "Tasks",
+        "file": "dist/assets/Tasks-B6ifnl2M.js",
+        "raw": "6.50 kB",
+        "gzip": "2.15 kB"
+      },
+      {
+        "name": "TaskChart (Recharts)",
+        "file": "dist/assets/TaskChart-tmZUWyI1.js",
+        "raw": "389.80 kB",
+        "gzip": "111.06 kB"
+      }
+    ],
+    "totalJsFiles": 11
+  },
+  "measurements": {
+    "unthrottled": {
+      "condition": "unthrottled",
+      "throttled": false,
+      "runs": [
+        {
+          "run": 1,
+          "jsRequests": 2,
+          "totalJsTransferredBytes": 241359,
+          "totalJsTransferredKB": "235.70",
+          "domContentLoadedMs": 101,
+          "loadEventMs": 102,
+          "jsFiles": [
+            {
+              "url": "index-Dwc4Ukyf.js",
+              "sizeBytes": 239718
+            },
+            {
+              "url": "Home-lz7-31af.js",
+              "sizeBytes": 1641
+            }
+          ]
+        },
+        {
+          "run": 2,
+          "jsRequests": 1,
+          "totalJsTransferredBytes": 239718,
+          "totalJsTransferredKB": "234.10",
+          "domContentLoadedMs": 79,
+          "loadEventMs": 80,
+          "jsFiles": [
+            {
+              "url": "index-Dwc4Ukyf.js",
+              "sizeBytes": 239718
+            }
+          ]
+        },
+        {
+          "run": 3,
+          "jsRequests": 1,
+          "totalJsTransferredBytes": 239718,
+          "totalJsTransferredKB": "234.10",
+          "domContentLoadedMs": 76,
+          "loadEventMs": 76,
+          "jsFiles": [
+            {
+              "url": "index-Dwc4Ukyf.js",
+              "sizeBytes": 239718
+            }
+          ]
+        }
+      ],
+      "averages": {
+        "jsRequests": 2,
+        "totalJsTransferredKB": 234.63,
+        "domContentLoadedMs": 85,
+        "loadEventMs": 86
+      }
+    },
+    "slow3G": {
+      "condition": "slow3g",
+      "throttled": true,
+      "runs": [
+        {
+          "run": 1,
+          "jsRequests": 1,
+          "totalJsTransferredBytes": 239718,
+          "totalJsTransferredKB": "234.10",
+          "domContentLoadedMs": 2455,
+          "loadEventMs": 2455,
+          "jsFiles": [
+            {
+              "url": "index-Dwc4Ukyf.js",
+              "sizeBytes": 239718
+            }
+          ]
+        },
+        {
+          "run": 2,
+          "jsRequests": 1,
+          "totalJsTransferredBytes": 239718,
+          "totalJsTransferredKB": "234.10",
+          "domContentLoadedMs": 2458,
+          "loadEventMs": 2458,
+          "jsFiles": [
+            {
+              "url": "index-Dwc4Ukyf.js",
+              "sizeBytes": 239718
+            }
+          ]
+        },
+        {
+          "run": 3,
+          "jsRequests": 1,
+          "totalJsTransferredBytes": 239718,
+          "totalJsTransferredKB": "234.10",
+          "domContentLoadedMs": 2453,
+          "loadEventMs": 2453,
+          "jsFiles": [
+            {
+              "url": "index-Dwc4Ukyf.js",
+              "sizeBytes": 239718
+            }
+          ]
+        }
+      ],
+      "averages": {
+        "jsRequests": 1,
+        "totalJsTransferredKB": 234.1,
+        "domContentLoadedMs": 2455,
+        "loadEventMs": 2455
+      }
+    }
+  },
+  "navigationFlowChunks": [
+    {
+      "file": "index-Dwc4Ukyf.js",
+      "status": 200
+    },
+    {
+      "file": "Home-lz7-31af.js",
+      "status": 200
+    },
+    {
+      "file": "index-Dwc4Ukyf.js",
+      "status": 200
+    },
+    {
+      "file": "Analytics-BYpNAmB7.js",
+      "status": 200
+    }
+  ]
+}

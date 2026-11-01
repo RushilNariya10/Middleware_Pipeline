@@ -1,7 +1,5 @@
-# Practical 11 - whole stack with one command:  docker compose up --build
-# Expects the two repositories side by side:
-#   ./Middleware_Pipeline  (this repo: task-api/ backend + this file)
-#   ../portfolio-24IT055   (React frontend)
+# Practical 11 - Full Stack Orchestration: docker compose up --build
+# Unified AWDF Project (24IT055 - Rushil Nariya)
 services:
   mongodb:
     image: mongo:7
@@ -37,7 +35,7 @@ services:
 
   frontend:
     build:
-      context: ../portfolio-24IT055
+      context: ./portfolio-24IT055
     container_name: awdf-frontend
     restart: unless-stopped
     ports:
@@ -52,3 +50,4 @@ networks:
 
 volumes:
   mongo-data:
+
