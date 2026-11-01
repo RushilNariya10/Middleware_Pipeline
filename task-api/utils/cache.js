@@ -133,7 +133,7 @@ function getDetailedStats() {
 
   return {
     cacheEnabled: isCacheEnabled(),
-    configuredTTL: parseInt(process.env.CACHE_TTL_SECONDS, 10) || defaultTTL,
+    configuredTTL: getActiveTTL(),
     keysCount: cache.keys().length,
     activeKeys: cache.keys(),
     breakdown: {

@@ -37,7 +37,7 @@ async function waitForServer(port = 3000, maxRetries = 20) {
   for (let i = 0; i < maxRetries; i++) {
     try {
       await new Promise((resolve, reject) => {
-        const r = http.get(`http://127.0.0.1:${port}/tasks`, { headers: { 'Authorization': 'test' } }, (res) => {
+        const r = http.get(`http://127.0.0.1:${port}/tasks`, { headers: { 'Authorization': 'test' } }, () => {
           resolve();
         });
         r.on('error', reject);

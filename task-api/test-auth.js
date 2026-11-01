@@ -292,7 +292,7 @@ async function runTests() {
     // 18. Password is stored as bcrypt hash
     await test('Database: password is stored as bcrypt hash (starts with $2)', async () => {
       const User = require('./models/User');
-      const user = await User.findOne({ email: 'test@example.com' }).select('+password');
+      await User.findOne({ email: 'test@example.com' }).select('+password');
       // Since password is selected via Mongoose, we need the raw doc
       const rawDoc = await mongoose.connection.db.collection('users').findOne({ email: 'test@example.com' });
       assert(rawDoc.password.startsWith('$2'), `Expected bcrypt hash, got: ${rawDoc.password.substring(0, 10)}...`);
