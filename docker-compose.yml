@@ -1,0 +1,54 @@
+# Practical 11 - whole stack with one command:  docker compose up --build
+# Expects the two repositories side by side:
+#   ./Middleware_Pipeline  (this repo: task-api/ backend + this file)
+#   ../portfolio-24IT055   (React frontend)
+services:
+  mongodb:
+    image: mongo:7
+    container_name: awdf-mongodb
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db          # named volume: tasks survive container restarts
+    networks: [app-network]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./task-api
+    container_name: awdf-backend
+    restart: unless-stopped
+    environment:
+      PORT: "3000"
+      # service NAME, not localhost: inside the backend container "localhost" is the container itself
+      MONGO_URI: mongodb://mongodb:27017/taskdb
+      JWT_SECRET: ${JWT_SECRET:-change-this-secret-in-a-root-.env-file}
+      CACHE_TTL_SECONDS: "60"
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    ports:
+      - "3000:3000"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks: [app-network]
+
+  frontend:
+    build:
+      context: ../portfolio-24IT055
+    container_name: awdf-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"                    # host 5173 -> nginx 80 inside the container
+    depends_on:
+      - backend
+    networks: [app-network]
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
