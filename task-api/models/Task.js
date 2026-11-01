@@ -24,6 +24,11 @@ const taskSchema = new mongoose.Schema({
   }
 });
 
+// Database performance indexes:
+// Accelerates sorting by recency and filtering by completion/priority status
+taskSchema.index({ createdAt: -1 });
+taskSchema.index({ completed: 1, priority: 1 });
+
 // Pre-save hook that automatically trims whitespace from the title field
 taskSchema.pre('save', function () {
   if (this.title) {

@@ -22,6 +22,14 @@ router.post('/generate-description', authMiddleware, async (req, res) => {
   // Rate limit per task (taskId from the client, else the title text)
   const key = `${req.user.id}:${req.body.taskId || title.toLowerCase()}`;
   const now = Date.now();
+
+  // Optimized periodic cleanup to prevent unbounded Map memory growth
+  if (lastCall.size > 200) {
+    for (const [k, time] of lastCall.entries()) {
+      if (now - time > WINDOW_MS) lastCall.delete(k);
+    }
+  }
+
   const prev = lastCall.get(key);
   if (prev && now - prev < WINDOW_MS) {
     const wait = Math.ceil((WINDOW_MS - (now - prev)) / 1000);

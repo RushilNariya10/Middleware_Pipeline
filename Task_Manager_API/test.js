@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
 process.env.NODE_ENV = 'test';
-process.env.PORT = '3000';
+process.env.PORT = process.env.TEST_PORT || '3002';
 
 let mongod;
 let app;
@@ -19,7 +19,7 @@ function request(path, options = {}) {
 
     const reqOptions = {
       hostname: '127.0.0.1',
-      port: 3000,
+      port: parseInt(process.env.PORT, 10),
       path: path,
       method: options.method || 'GET',
       headers: Object.assign({}, defaultHeaders, options.headers || {})
@@ -70,8 +70,8 @@ async function runTests() {
   Task = require('./models/Task');
 
   // Start listening on port 3000
-  server = app.listen(3000, () => {
-    console.log('✔ Express API listening on http://localhost:3000\n');
+  server = app.listen(parseInt(process.env.PORT, 10), () => {
+    console.log('✔ Express API listening on http://localhost:' + process.env.PORT + '\n');
   });
 
   // Wait for mongoose connection

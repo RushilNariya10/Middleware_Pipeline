@@ -18,7 +18,7 @@ async function notifyTaskCreated(task, userId) {
 
   let assigned = 'unknown';
   try {
-    const user = await User.findById(userId).select('email');
+    const user = await User.findById(userId).select('email').lean();
     if (user) assigned = user.email;
   } catch { /* lookup failure must never break the notification */ }
 
@@ -36,7 +36,7 @@ taskEvents.on('task-created', (task, userId) => {
 // Listener 2 (supplementary): task-deleted
 taskEvents.on('task-deleted', async (task, userId) => {
   try {
-    const user = await User.findById(userId).select('email');
+    const user = await User.findById(userId).select('email').lean();
     console.log(
       `[Cleanup] Task "${task.title}" (id ${task._id}) was deleted by ` +
       `${user ? user.email : 'unknown'} at ${new Date().toISOString()}`
@@ -53,4 +53,3 @@ taskEvents.on('handler-error', (eventName, err) => {
 });
 
 module.exports = { notifyTaskCreated };
-

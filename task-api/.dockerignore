@@ -11,3 +11,8 @@ assets
 docs
 __tests__
 coverage
+test.js
+test-auth.js
+test-live.js
+start-db.js
+scripts

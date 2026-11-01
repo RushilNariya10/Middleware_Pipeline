@@ -45,7 +45,7 @@ app.use('/api/ai', aiRoutes);
 // ── Task routes (all protected by auth middleware) ──
 // Pipeline order: Auth → Validation → Cache check → Controller
 
-// GET - Get all tasks (Cached)
+// GET - Get all tasks (Cached, optimized with .lean() for fast serialization and lower memory)
 app.get('/tasks', authMiddleware, async (req, res, next) => {
   try {
     const key = getCacheKey('all');
@@ -63,7 +63,7 @@ app.get('/tasks', authMiddleware, async (req, res, next) => {
       res.setHeader('X-Cache', 'BYPASS');
     }
 
-    const tasks = await Task.find();
+    const tasks = await Task.find().lean();
 
     if (isCacheEnabled()) {
       cache.set(key, tasks, getActiveTTL());
@@ -75,7 +75,7 @@ app.get('/tasks', authMiddleware, async (req, res, next) => {
   }
 });
 
-// GET - Get single task by ID (Supplementary Problem - Cached separately)
+// GET - Get single task by ID (Supplementary Problem - Cached separately, optimized with .lean())
 app.get('/tasks/:id', authMiddleware, async (req, res, next) => {
   try {
     const key = getCacheKey('single', req.params.id);
@@ -93,7 +93,7 @@ app.get('/tasks/:id', authMiddleware, async (req, res, next) => {
       res.setHeader('X-Cache', 'BYPASS');
     }
 
-    const task = await Task.findById(req.params.id);
+    const task = await Task.findById(req.params.id).lean();
     if (!task) {
       return res.status(404).json({
         message: 'Task not found'
@@ -147,7 +147,7 @@ app.post('/tasks', authMiddleware, validateTask, async (req, res, next) => {
   }
 });
 
-// PUT - Update a task (Auth → Validate → Controller)
+// PUT - Update a task (Auth → Validate → Controller, optimized with .lean())
 app.put('/tasks/:id', authMiddleware, validateTask, async (req, res, next) => {
   try {
     const task = await Task.findByIdAndUpdate(
@@ -157,7 +157,7 @@ app.put('/tasks/:id', authMiddleware, validateTask, async (req, res, next) => {
         new: true,
         runValidators: true
       }
-    );
+    ).lean();
     if (!task) {
       return res.status(404).json({
         message: 'Task not found'

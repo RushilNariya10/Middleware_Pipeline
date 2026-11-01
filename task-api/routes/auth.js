@@ -68,13 +68,17 @@ router.post('/login', validateLogin, async (req, res, next) => {
 });
 
 // ──────────────────────────────────────────────
-// GET /api/auth/me – return current user (protected)
+// GET /api/auth/me – return current user (protected, optimized projection)
 // ──────────────────────────────────────────────
 router.get('/me', authMiddleware, async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user.id).select('-password').lean();
     if (!user) {
       return res.status(404).json({ message: 'User not found.' });
+    }
+    // Rename _id to id or keep both for maximum client compatibility
+    if (user._id && !user.id) {
+      user.id = user._id.toString();
     }
     res.status(200).json({ user });
   } catch (err) {
@@ -83,4 +87,3 @@ router.get('/me', authMiddleware, async (req, res, next) => {
 });
 
 module.exports = router;
-
