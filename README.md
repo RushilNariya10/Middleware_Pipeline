@@ -165,6 +165,43 @@ Each practical includes dedicated automated tests to verify functionality:
 
 ---
 
+
+---
+
+## 📬 Postman API Endpoints Reference
+
+### 1. Authentication Endpoints (/api/auth)
+- POST /api/auth/register - Create user with email and hashed password (201)
+- POST /api/auth/login - Authenticate and receive JWT token (200)
+- GET /api/auth/me - Get profile of authenticated user [Bearer Token] (200)
+
+### 2. Task Management Endpoints (/tasks)
+- GET /tasks - Retrieve all tasks (served with in-memory cache) [Bearer Token] (200)
+- GET /tasks/:id - Retrieve single task by ObjectId [Bearer Token] (200)
+- POST /tasks - Create new task, trigger event notification, and invalidate cache [Bearer Token] (201)
+- PUT /tasks/:id - Update existing task and invalidate cache [Bearer Token] (200)
+- DELETE /tasks/:id - Delete task and invalidate cache [Bearer Token] (200)
+
+### 3. AI & Telemetry Endpoints
+- POST /api/ai/generate-description - Generate task description & priority with fallback protection [Bearer Token] (200)
+- GET /api/debug/cache-stats - Real-time cache telemetry (hits, misses, hit ratio, active TTL) [Bearer Token] (200)
+
+---
+
+## 🗄️ MongoDB Collections & Schema
+
+### users Collection (	ask-api/models/User.js)
+- email: String (required, unique, lowercase, trimmed)
+- password: String (required, bcrypt hashed)
+- createdAt: Date (default: Date.now)
+
+### 	asks Collection (	ask-api/models/Task.js)
+- 	itle: String (required, trimmed, length: 3-100)
+- description: String (trimmed, max 500)
+- completed: Boolean (default: false)
+- priority: String (enum: ['low', 'medium', 'high'], default: 'medium')
+- createdAt & updatedAt: Automatic Mongoose timestamps
+
 ## 🛡️ License & Academic Declaration
 Developed by **Rushil Nariya (24IT055)** for the **Advanced Web Development Frameworks (ITUE301)** coursework at **CHARUSAT**.
 
