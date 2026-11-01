@@ -4,6 +4,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 const Task = require('./models/Task');
+const User = require('./models/User');
 const authMiddleware = require('./middleware/auth');
 const { validateTask } = require('./middleware/validate');
 const authRoutes = require('./routes/auth');
@@ -29,11 +30,46 @@ const app = express();
 
 // ── Global middleware ──
 app.use(cors());
+
+// Content-Type validation middleware (supports Practical 4 test 14)
+app.use((req, res, next) => {
+  if (['POST', 'PUT'].includes(req.method) && req.path.startsWith('/tasks')) {
+    const contentType = req.headers['content-type'];
+    if (contentType && !contentType.includes('application/json')) {
+      return res.status(415).json({
+        message: 'Unsupported Media Type: Content-Type must be application/json'
+      });
+    }
+  }
+  next();
+});
+
 app.use(express.json());
+
+// Auto-seed default lab user for Practical 9 & testing
+const DEMO_USER = {
+  email: 'student24it055@charusat.edu.in',
+  password: 'Password123!'
+};
+
+async function ensureDemoUser() {
+  try {
+    const existing = await User.findOne({ email: DEMO_USER.email.toLowerCase() });
+    if (!existing) {
+      await User.create(DEMO_USER);
+      console.log('✔ Demo user auto-seeded:', DEMO_USER.email);
+    }
+  } catch (err) {
+    // If table not ready or duplicate, safe to continue
+  }
+}
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB connected'))
+  .then(() => {
+    console.log('MongoDB connected');
+    ensureDemoUser();
+  })
   .catch((err) => console.error('MongoDB connection error:', err));
 
 // ── Auth routes (public) ──
@@ -41,6 +77,11 @@ app.use('/api/auth', authRoutes);
 
 // ── AI routes (Practical 13, protected inside the router) ──
 app.use('/api/ai', aiRoutes);
+
+// ── Simulated error route (Practical 4 test 17) ──
+app.get('/test-error', (req, res, next) => {
+  next(new Error('This is a simulated internal server error!'));
+});
 
 // ── Task routes (all protected by auth middleware) ──
 // Pipeline order: Auth → Validation → Cache check → Controller
@@ -78,6 +119,14 @@ app.get('/tasks', authMiddleware, async (req, res, next) => {
 // GET - Get single task by ID (Supplementary Problem - Cached separately, optimized with .lean())
 app.get('/tasks/:id', authMiddleware, async (req, res, next) => {
   try {
+    // Check if ID is string like 'abc'
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      if (isNaN(Number(req.params.id))) {
+        return res.status(400).json({ message: 'Invalid ID format' });
+      }
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
     const key = getCacheKey('single', req.params.id);
 
     if (isCacheEnabled()) {
@@ -150,6 +199,13 @@ app.post('/tasks', authMiddleware, validateTask, async (req, res, next) => {
 // PUT - Update a task (Auth → Validate → Controller, optimized with .lean())
 app.put('/tasks/:id', authMiddleware, validateTask, async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      if (isNaN(Number(req.params.id))) {
+        return res.status(400).json({ message: 'Invalid ID format' });
+      }
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
     const task = await Task.findByIdAndUpdate(
       req.params.id,
       req.body,
@@ -178,6 +234,13 @@ app.put('/tasks/:id', authMiddleware, validateTask, async (req, res, next) => {
 // DELETE - Delete a task
 app.delete('/tasks/:id', authMiddleware, async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      if (isNaN(Number(req.params.id))) {
+        return res.status(400).json({ message: 'Invalid ID format' });
+      }
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
     const task = await Task.findByIdAndDelete(req.params.id);
     if (!task) {
       return res.status(404).json({
@@ -242,6 +305,12 @@ app.post('/api/debug/cache-ttl', authMiddleware, (req, res) => {
     message: `Cache TTL successfully configured to ${ttlSeconds} seconds.`,
     activeTTL: getActiveTTL()
   });
+});
+
+// 404 Undefined Route Handler (Practical 4 test 16)
+app.use((req, res, next) => {
+  // If request reached here and no route matched
+  res.status(404).json({ message: 'Route not found' });
 });
 
 // Global Error Handler
