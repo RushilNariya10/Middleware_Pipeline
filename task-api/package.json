@@ -6,8 +6,10 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
+    "start:db": "node start-db.js",
     "test": "jest --runInBand --forceExit --silent --verbose",
     "test:auth": "node test-auth.js",
+    "test:live": "node test-live.js",
     "lint": "eslint .",
     "demo:events": "node scripts/event-demo.js event"
   },
