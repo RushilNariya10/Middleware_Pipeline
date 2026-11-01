@@ -7,6 +7,11 @@ const Task = require('./models/Task');
 const authMiddleware = require('./middleware/auth');
 const { validateTask } = require('./middleware/validate');
 const authRoutes = require('./routes/auth');
+const aiRoutes = require('./routes/ai'); // Practical 13
+
+// Practical 10 - event-driven background processing
+const taskEvents = require('./events');
+const { notifyTaskCreated } = require('./listeners'); // requiring registers all listeners
 const {
   cache,
   isCacheEnabled,
@@ -33,6 +38,9 @@ mongoose.connect(process.env.MONGO_URI)
 
 // ── Auth routes (public) ──
 app.use('/api/auth', authRoutes);
+
+// ── AI routes (Practical 13, protected inside the router) ──
+app.use('/api/ai', aiRoutes);
 
 // ── Task routes (all protected by auth middleware) ──
 // Pipeline order: Auth → Validation → Cache check → Controller
@@ -118,7 +126,22 @@ app.post('/tasks', authMiddleware, validateTask, async (req, res, next) => {
       invalidateTasksCache();
     }
 
+    // Practical 10 - EXPERIMENT ONLY (NOTIFY_MODE=inline): do the notification work
+    // inside the route and WAIT for it, to measure what blocking costs the client.
+    if (process.env.NOTIFY_MODE === 'inline') {
+      await notifyTaskCreated(task, req.user.id);
+      console.log(`[API] Response sent at ${new Date().toISOString()} (inline mode)`);
+      return res.status(201).json(task);
+    }
+
+    // Default: respond FIRST, emit AFTER. emit() never makes the client wait.
+    console.log(`[API] Response sent at ${new Date().toISOString()}`);
+    res.on('finish', () => {
+      console.log(`[API] Response fully flushed to client at ${new Date().toISOString()}`);
+    });
     res.status(201).json(task);
+    taskEvents.emit('task-created', task, req.user.id);
+    return;
   } catch (err) {
     next(err);
   }
@@ -171,6 +194,7 @@ app.delete('/tasks/:id', authMiddleware, async (req, res, next) => {
       message: 'Task deleted successfully',
       task
     });
+    taskEvents.emit('task-deleted', task, req.user.id); // Practical 10 - second event
   } catch (err) {
     next(err);
   }
@@ -221,6 +245,7 @@ app.post('/api/debug/cache-ttl', authMiddleware, (req, res) => {
 });
 
 // Global Error Handler
+// eslint-disable-next-line no-unused-vars -- Express identifies error handlers by their 4-argument signature
 app.use((err, req, res, next) => {
   console.error(err);
 
