@@ -46,3 +46,4 @@ test('rate limit: second call for the same task within a minute gets 429', async
 test('missing title is rejected with 400', async () => {
   expect((await ask({})).statusCode).toBe(400);
 });
+
